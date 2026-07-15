@@ -24,16 +24,42 @@ Ce projet adopte une organisation rigoureuse inspirée du standard **BIDS** (Bra
 
 ## Contenu du projet
 
-Le pipeline est divisé en scripts autonomes pour une meilleure reproductibilité :
+Chaque script a un rôle spécifique dans le pipeline de traitement des données neurovasculaires.
 
-1.  **`01_frangi_registration.py`** : Effectue le prétraitement (inversion, filtre de Frangi) sur les IRM et réalise le recalage rigide initial de l'angiographie sur le squelette IRM.
-2.  **`02_build_template.py`** : Construit un template anatomique moyen à partir de l'ensemble de la cohorte en utilisant `ants.build_template`.
-3.  **`03_evaluate_metrics.py`** : Calcule les performances du recalage via des métriques comme le NMI (Normalized Mutual Information) et le Dice score, avec visualisation (Overlay).
-4.  **`04_register_irm_to_template.py`** : Calcule les transformations non-linéaires (`SyN`) entre chaque IRM native et le template global.
-5.  **`05_apply_T3_combination.py`** : Combine les transformations pour projeter les angiographies dans l'espace du template en une seule passe.
-6.  **`06_compute_average_angio.py`** : Calcule le cerveau moyen vasculaire final dans l'espace du template.
-7.  **`preprocess_bids.sh`** : Script Bash pour le *Skull-Stripping* (BET) et le masquage des T1 sur toute l'arborescence.
+### 1. `brain.sh`
+*   **Description** : Script Bash de prétraitement. Il effectue le *skull-stripping* (extraction du cerveau) sur les images T2 via l'outil FSL `bet` et propage les masques sur les images T1 pour isoler les tissus cérébraux.
+*   **Input** : Images T1 et T2 brutes dans l'arborescence BIDS.
+*   **Output** : Masques binaires (`_brain_mask.nii.gz`) et images extraites (`_brain_extracted.nii.gz`).
 
+### 2. `Frangi_filter.py`
+*   **Description** : Prépare les données vasculaires en inversant les contrastes des IRM et en appliquant un filtre de Frangi pour créer un squelette vasculaire. Il réalise ensuite le recalage rigide initial de l'angiographie (fUS) sur ce squelette.
+*   **Input** : Angiographies brutes et IRM extraites (`_brain_extracted`).
+*   **Output** : Images Frangi (`_desc-frangi.nii.gz`), images inversées et matrices de recalage `_TF1_fus_to_T1.mat`.
+
+### 3. `recalage_angio_to_T2_star.py`
+*   **Description** : Automatise le processus de recalage rigide pour l'ensemble de la cohorte patient.
+*   **Input** : Angiographies et images Frangi traitées.
+*   **Output** : Angio recalée (`_registered.nii.gz`) et copie des matrices `.mat`.
+
+### 4. `matrice_TF1.py`
+*   **Description** : Calcule la moyenne mathématique des matrices affines (Angio $\rightarrow$ IRM) sur l'ensemble de la cohorte pour obtenir une transformation globale robuste.
+*   **Input** : Tous les fichiers `_TF1_fus_to_T1.mat`.
+*   **Output** : `average_TF1_fus_to_T1.mat`.
+
+### 5. `IRM_on_template.py`
+*   **Description** : Calcule les déformations non-linéaires (`SyN`) entre chaque IRM native et le template anatomique de référence.
+*   **Input** : IRM individuelles (T1/T2) et le `template_T2_brain.nii.gz`.
+*   **Output** : Images alignées sur le template (`_aligned_to_template.nii.gz`) et fichiers de transformation (`_1Warp.nii.gz`, `_0GenericAffine.mat`).
+
+### 6. `matrice_TF2.py`
+*   **Description** : Calcule la matrice affine moyenne (IRM $\rightarrow$ Template) sur toute la cohorte.
+*   **Input** : Tous les fichiers `_T2_to_template_0GenericAffine.mat`.
+*   **Output** : `average_T2_to_template_Affine.mat`.
+
+### 7. `apply_TF1_TF2.py`
+*   **Description** : Projette une angiographie spécifique dans l'espace template en combinant les transformations moyennes calculées précédemment (Angio $\rightarrow$ IRM puis IRM $\rightarrow$ Template) en une seule passe.
+*   **Input** : Angio native, `average_TF1_fus_to_T1.mat`, `average_T2_to_template_Affine.mat`.
+*   **Output** : Angio projetée dans l'espace template (`_space-template_angio.nii.gz`).
 ## 🛠 Prérequis et Bibliothèques
 
 ### 1. Environnement Python
