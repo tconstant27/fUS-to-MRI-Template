@@ -46,17 +46,22 @@ Calcule la moyenne mathématique des matrices affines (Angio $\rightarrow$ IRM) 
 *   **Input** : Tous les fichiers `_TF1_fus_to_T1.mat`.
 *   **Output** : `average_TF1_fus_to_T1.mat`.
 
-### 5. `IRM_on_template.py`
+### 5. `Template_T2.py`
+Construit un template anatomique robuste. Il effectue un recalage rigide de toutes les images sur une référence, puis génère le template final via une approche non-linéaire (`SyN`) itérative.
+*   **Input** : Ensemble des fichiers T2 extraits (`*_brain.nii.gz`) dans `derivatives/`.
+*   **Output** : `template_T2_brain.nii.gz`.
+
+### 6. `IRM_on_template.py`
 Calcule les déformations non-linéaires (`SyN`) entre chaque IRM native et le template anatomique de référence.
 *   **Input** : IRM individuelles (T1/T2) et le `template_T2_brain.nii.gz`.
 *   **Output** : Images alignées sur le template (`_aligned_to_template.nii.gz`) et fichiers de transformation (`_1Warp.nii.gz`, `_0GenericAffine.mat`).
 
-### 6. `matrice_TF2.py`
+### 7. `matrice_TF2.py`
 Calcule la matrice affine moyenne (IRM $\rightarrow$ Template) sur toute la cohorte.
 *   **Input** : Tous les fichiers `_T2_to_template_0GenericAffine.mat`.
 *   **Output** : `average_T2_to_template_Affine.mat`.
 
-### 7. `apply_TF1_TF2.py`
+### 8. `apply_TF1_TF2.py`
 Projette une angiographie spécifique dans l'espace template en combinant les transformations moyennes calculées précédemment (Angio $\rightarrow$ IRM puis IRM $\rightarrow$ Template) en une seule passe.
 *   **Input** : Angio native, `average_TF1_fus_to_T1.mat`, `average_T2_to_template_Affine.mat`.
 *   **Output** : Angio projetée dans l'espace template (`_space-template_angio.nii.gz`).
