@@ -24,7 +24,7 @@ Ce projet adopte une organisation rigoureuse inspirée du standard **BIDS** (Bra
 
 ## Contenu du projet
 
-Chaque script a un rôle spécifique dans le pipeline de traitement des données neurovasculaires.
+Tous les scripts de ce pipeline utilisent le dossier derivatives/ comme point d'entrée central. Chaque programme est conçu pour parcourir automatiquement cette arborescence afin de sélectionner lui-même les fichiers et matrices nécessaires à son exécution.
 
 ### 1. `brain.sh`
 Script Bash de prétraitement. Il effectue le *skull-stripping* (extraction du cerveau) sur les images T2 via l'outil FSL `bet` et propage les masques sur les images T1 pour isoler les tissus cérébraux.
