@@ -36,7 +36,7 @@ Prépare les données vasculaires en inversant les contrastes des IRM et en appl
 *   **Input** : Angiographies brutes et IRM extraites (`_brain_extracted`).
 *   **Output** : Images Frangi (`_desc-frangi.nii.gz`), images inversées et matrices de recalage `_TF1_fus_to_T1.mat`.
 
-### 3. `recalage_angio_to_T2_star.py`
+### 3. `recalage_angio_to_T1.py`
 Automatise le processus de recalage rigide pour l'ensemble de la cohorte patient.
 *   **Input** : Angiographies et images Frangi traitées.
 *   **Output** : Angio recalée (`_registered.nii.gz`) et copie des matrices `.mat`.
