@@ -75,5 +75,3 @@ Le projet utilise principalement **ANTsPy** pour le traitement d'images.
 pip install antspyx scikit-image numpy matplotlib scipy
 
 
-Add paramètres séquences, protocoles détaillés etc
-conseils visualisations, logiciel itk snap
