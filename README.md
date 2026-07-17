@@ -41,10 +41,6 @@ Automatise le processus de recalage rigide pour l'ensemble de la cohorte patient
 *   **Input** : Angiographies et images Frangi traitées.
 *   **Output** : Angio recalée (`_registered.nii.gz`) et copie des matrices `.mat`.
 
-### 4. `matrice_TF1.py`
-Calcule la moyenne mathématique des matrices affines (Angio $\rightarrow$ IRM) sur l'ensemble de la cohorte pour obtenir une transformation globale robuste.
-*   **Input** : Tous les fichiers `_TF1_fus_to_T1.mat`.
-*   **Output** : `average_TF1_fus_to_T1.mat`.
 
 ### 5. `Template_T2.py`
 Construit un template anatomique robuste. Il effectue un recalage rigide de toutes les images sur une référence, puis génère le template final via une approche non-linéaire (`SyN`) itérative.
@@ -56,16 +52,10 @@ Calcule les déformations non-linéaires (`SyN`) entre chaque IRM native et le t
 *   **Input** : IRM individuelles (T1/T2) et le `template_T2_brain.nii.gz`.
 *   **Output** : Images alignées sur le template (`_aligned_to_template.nii.gz`) et fichiers de transformation (`_1Warp.nii.gz`, `_0GenericAffine.mat`).
 
-### 7. `matrice_TF2.py`
-Calcule la matrice affine moyenne (IRM $\rightarrow$ Template) sur toute la cohorte.
-*   **Input** : Tous les fichiers `_T2_to_template_0GenericAffine.mat`.
-*   **Output** : `average_T2_to_template_Affine.mat`.
-
-### 8. `apply_TF1_TF2.py`
-Projette une angiographie spécifique dans l'espace template en combinant les transformations moyennes calculées précédemment (Angio $\rightarrow$ IRM puis IRM $\rightarrow$ Template) en une seule passe.
-*   **Input** : Angio native, `average_TF1_fus_to_T1.mat`, `average_T2_to_template_Affine.mat`.
-*   **Output** : Angio projetée dans l'espace template (`_space-template_angio.nii.gz`).
-## 🛠 Prérequis et Bibliothèques
+### 8. `angio_on_template_angio.py`
+Réalise le recalage non-linéaire (**SyN**) des images angiographiques fUS natives vers l'espace du template moyen. Cette étape assure la mise en correspondance spatiale des données vasculaires avec le template IRM/fUS de référence, garantissant que toutes les données sont superposables à l'anatomie standardisée.
+*   **Input** : Angiographies fUS natives et template moyen `average_template_space_angio.nii.gz`.
+*   **Output** : Images angio-fUS recalées (`_on_MRI_space.nii.gz`) sauvegardées dans le répertoire `derivatives`.
 
 ### 1. Environnement Python
 Le projet utilise principalement **ANTsPy** pour le traitement d'images.
